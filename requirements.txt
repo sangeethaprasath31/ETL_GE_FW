@@ -29,3 +29,12 @@ pytest: 8.x
 
 add the project in git : 
 git init
+git add .
+git commit -m "Initial commit"
+
+git remote -v - to verify remote repo is generated
+git log --oneline - to verify the log 
+git remote add origin https://github.com/sangeethaprasath31/ETL_GE_FW.git
+ git branch
+git push -u origin master
+
