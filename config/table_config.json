@@ -1,0 +1,68 @@
+{
+  "report_dir": "reports",
+  "runtime": {
+    "chunksize": 100000,
+    "sample_limit": 2,
+    "fail_fast": false
+  },
+  "connections": {
+    "sqlserver": {
+      "type": "snowflake",
+      "env_prefix": "SNOWFLAKE"
+    },
+    "snowflake": {
+      "type": "snowflake",
+      "env_prefix": "SNOWFLAKE"
+    }
+  },
+  "layer_meta_columns": {
+    "source": [ ],
+    "open": [
+      "HIRE_DATE"
+    ],
+    "bronze": [
+      "HIRE_DATE"
+    ],
+    "silver": [
+      "HIRE_DATE"
+    ],
+    "gold": [
+      "HIRE_DATE"
+    ]
+  },
+  "default_rules": {
+    "primary_key": []
+  },
+  "tables": [
+    {
+      "name": "EMPLOYEE",
+      "enabled": true,
+      "primary_key": ["EMP_NO"],
+      "not_null_columns": ["EMP_NO"],
+      "unique_columns": ["EMP_NO"],
+      "incremental_column": "UPDATED_AT",
+      "job_window": {
+        "start": "2026-06-19 00:00:00",
+        "end": "2026-06-20 00:00:00"
+      },
+      "layers": {
+        "source": {
+          "connection": "snowflake",
+          "table": "company.employee",
+          "query": "SELECT * FROM EMPLOYEE.COMPANY.EMPLOYEE"
+        },
+        "open": {
+          "connection": "snowflake",
+          "table": "company.employee",
+          "query": "SELECT * FROM EMPLOYEE.COMPANY.EMPLOYEE_target"
+        }
+      },
+
+      "comparisons": [
+        {"source_layer": "source", "target_layer": "open"}
+      
+      ]
+    }
+    
+  ]
+}
