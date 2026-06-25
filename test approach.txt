@@ -1,0 +1,452 @@
+ETL Data Quality Validation Framework Testing Approach
+1. Objective
+
+Validate data movement and transformation across all layers:
+
+SQL Server
+    |
+    v
+OpenFlow
+    |
+    v
+Bronze
+    |
+    v
+Silver
+    |
+    v
+Gold
+
+Ensure:
+
+Data completeness
+Data accuracy
+Data consistency
+Schema conformity
+Business rule compliance
+Incremental load correctness
+
+for all 36 tables.
+
+2. Scope
+In Scope
+Data Pipeline Validation
+SQL → OpenFlow
+OpenFlow → Bronze
+Bronze → Silver
+Silver → Gold
+Data Quality Checks
+Null validation
+Duplicate validation
+Datatype validation
+Length validation
+Pattern validation
+Domain validation
+Reconciliation
+Row counts
+Column counts
+Aggregate checks
+Hash validation
+Incremental Load Validation
+Business Rules
+Metadata Validation
+3. Testing Architecture
+Source SQL Server
+        |
+        v
+     OpenFlow
+        |
+        v
+      Bronze
+        |
+        v
+      Silver
+        |
+        v
+       Gold
+
+            |
+            v
+
+     DQ Framework
+      (Python + GX)
+
+            |
+            v
+
+     Validation Reports
+4. Validation Categories
+4.1 Schema Validation
+
+Validate:
+
+Validation	Tool
+Column Name	GX
+Column Count	Python
+Datatype	GX
+Nullable	GX
+Primary Key	Python
+
+Example:
+
+expect_table_columns_to_match_ordered_list
+expect_column_values_to_be_of_type
+4.2 Data Completeness Validation
+
+Validate:
+
+Row Count
+Missing Records
+Null Percentage
+
+GX Expectations:
+
+expect_table_row_count_to_be_between
+expect_column_values_to_not_be_null
+4.3 Uniqueness Validation
+
+Validate:
+
+PK uniqueness
+Composite key uniqueness
+
+GX:
+
+expect_column_values_to_be_unique
+
+Composite:
+
+expect_compound_columns_to_be_unique
+4.4 Data Type Validation
+
+Example:
+
+Column	Expected
+customer_id	int
+amount	decimal
+email	string
+
+GX:
+
+expect_column_values_to_be_of_type
+4.5 Pattern Validation
+
+Example:
+
+Email
+
+expect_column_values_to_match_regex
+
+Phone
+
+expect_column_values_to_match_regex
+4.6 Domain Validation
+
+Example:
+
+status
+-------
+ACTIVE
+INACTIVE
+PENDING
+
+GX:
+
+expect_column_values_to_be_in_set
+4.7 Range Validation
+
+Example:
+
+expect_column_values_to_be_between
+
+Checks:
+
+Age
+Salary
+Amount
+4.8 Referential Integrity
+
+Validate:
+
+customer.customer_id
+=
+orders.customer_id
+
+Python SQL validation:
+
+SELECT COUNT(*)
+FROM orders o
+LEFT JOIN customer c
+ON o.customer_id = c.customer_id
+WHERE c.customer_id IS NULL
+5. Reconciliation Validation
+
+Performed in Python.
+
+Row Count Validation
+source_count == target_count
+
+Validation Points:
+
+Layer
+SQL vs OpenFlow
+OpenFlow vs Bronze
+Bronze vs Silver
+Silver vs Gold
+Column Count Validation
+len(source.columns)
+==
+len(target.columns)
+Aggregate Validation
+SUM(amount)
+AVG(amount)
+MIN(amount)
+MAX(amount)
+Hash Validation
+
+Useful for large tables.
+
+Example:
+
+md5(
+ concat_ws(
+   '|',
+   all_columns
+ )
+)
+
+Compare source and target hashes.
+
+6. Incremental Load Validation
+
+Critical for daily loads.
+
+Watermark Validation
+
+Validate:
+
+max(updated_date)
+
+loaded correctly.
+
+Incremental Record Validation
+
+Expected:
+
+new_records
+=
+records_after_last_run
+Incremental Load %
+
+Metrics:
+
+incremental_percentage =
+(new_records / total_records) * 100
+
+Example:
+
+Table	Total	New	%
+Customer	100000	5000	5%
+Orders	200000	15000	7.5%
+Threshold Validation
+
+Example:
+
+Expected Incremental %
+=
+5% ± 2%
+
+Alert if:
+
+< 3%
+> 7%
+7. Layer-Specific Validation
+SQL → OpenFlow
+
+Validate:
+
+File generation
+Record count
+CDC extraction
+OpenFlow → Bronze
+
+Validate:
+
+Raw ingestion
+Metadata columns
+
+Example:
+
+load_date
+batch_id
+source_system
+Bronze → Silver
+
+Validate:
+
+Cleansing
+Standardization
+Deduplication
+Silver → Gold
+
+Validate:
+
+Business rules
+Aggregations
+KPI calculations
+8. GX Expectations Library
+Mandatory Expectations
+Table Level
+expect_table_row_count_to_be_between
+expect_table_columns_to_match_ordered_list
+Column Level
+expect_column_values_to_not_be_null
+
+expect_column_values_to_be_unique
+
+expect_column_values_to_be_of_type
+
+expect_column_values_to_be_between
+
+expect_column_values_to_be_in_set
+
+expect_column_values_to_match_regex
+
+expect_column_value_lengths_to_be_between
+Multi Column
+expect_compound_columns_to_be_unique
+9. Python Validation Framework
+
+Use Python for validations GX cannot perform efficiently.
+
+Reconciliation Engine
+
+Validate:
+
+row_count
+column_count
+hash_total
+aggregate_total
+Metadata Validation
+
+Validate:
+
+created_date
+updated_date
+batch_id
+CDC Validation
+
+Validate:
+
+INSERT
+UPDATE
+DELETE
+
+records.
+
+Transformation Validation
+
+Validate:
+
+source_value
+-> transformed_value
+
+business logic.
+
+10. Reporting
+
+Generate:
+
+Table Level Report
+Table	Layer	Check	Status
+Customer	Bronze	Null Check	Pass
+Customer	Silver	Duplicate Check	Pass
+Summary Report
+Total Tables
+36
+Passed
+34
+Failed
+2
+11. Phase-wise Deliverables
+Phase 1 – Framework Setup
+Deliverables
+GX Runtime Framework
+Connection Utilities
+SQL Server Connector
+OpenFlow Connector
+Logging Framework
+
+Duration: 1 Week
+
+Phase 2 – Core DQ Validation
+Deliverables
+Null Validation
+Duplicate Validation
+Datatype Validation
+Length Validation
+Domain Validation
+
+Duration: 1 Week
+
+Phase 3 – Reconciliation Engine
+Deliverables
+Row Count Comparison
+Column Count Comparison
+Aggregate Validation
+Hash Validation
+
+Duration: 1 Week
+
+Phase 4 – Incremental Load Validation
+Deliverables
+CDC Validation
+Watermark Validation
+Incremental Percentage Checks
+Historical Trend Validation
+
+Duration: 1 Week
+
+Phase 5 – Business Rule Validation
+Deliverables
+Transformation Validation
+Lookup Validation
+Referential Integrity Validation
+Gold Layer KPI Validation
+
+Duration: 1 Week
+
+Phase 6 – Reporting & CI/CD
+Deliverables
+HTML Reports
+GX Data Docs
+Excel Reports
+Azure DevOps/Jenkins Integration
+
+Duration: 1 Week
+
+Final Framework Recommendation
+
+For your 36-table project:
+
+Great Expectations
+
+Schema validation
+Null checks
+Duplicates
+Datatype
+Domain
+Pattern validations
+
+Python Framework
+
+Source-to-target reconciliation
+Hash comparisons
+Incremental load %
+CDC validation
+Cross-table validation
+Referential integrity
+Business-rule validation
+Report generation
+
+This hybrid approach typically gives the best balance of maintainability, scalability, and execution performance for enterprise SQL Server → Bronze → Silver → Gold ETL pipelines.
