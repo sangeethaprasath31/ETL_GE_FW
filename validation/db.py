@@ -46,7 +46,6 @@ def create_snowflake_engine(prefix: str) -> Engine:
     role = os.getenv(f"{prefix}ROLE")
     role_part = f"&role={quote_plus(role)}" if role else ""
    
-
     url = (
         f"snowflake://{user}:{password}@{account}/{database}/{schema}"
         f"?warehouse={warehouse}{role_part}"
@@ -54,20 +53,7 @@ def create_snowflake_engine(prefix: str) -> Engine:
     
     return create_engine(url, pool_pre_ping=True)
 
-'''
-def get_snowflake_engine():
-    
-    user = "SANGITARMP"
-    password = quote_plus("Angrybird@2026")
 
-    connection_string = (f"snowflake://{user}:{password}"
-        "@OKGQXGH-XZ64723/EMPLOYEE/PUBLIC"
-        "?warehouse=COMPUTE_WH"
-    )
-
-    return create_engine(connection_string)
-
-'''
 def create_engines(connection_config: dict) -> dict[str, Engine]:
     engines: dict[str, Engine] = {}
     for connection_name, details in connection_config.items():

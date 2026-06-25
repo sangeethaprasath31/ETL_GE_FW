@@ -113,7 +113,9 @@ def validate_table(table_config: dict, config: dict, engines: dict, runtime: GXR
             for column in sample_df.columns
             if column not in set(layer_meta_columns.get(layer_name, []))
         ]
+      
         dq_df = sample_df.loc[:, expected_columns]
+      
         results.extend(
             validate_data_quality(
                 runtime=runtime,
