@@ -1,0 +1,33 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Great Expectations Data Quality Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; color: #1f2937; }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .meta { color: #6b7280; margin-bottom: 24px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    .pass { color: #047857; font-weight: 700; }
+    .fail { color: #b91c1c; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Great Expectations Data Quality Report</h1>
+  <div class="meta">SQL Server -> Open -> Bronze -> Silver -> Gold</div>
+  <table>
+    <thead>
+      <tr><th>Table</th><th>Layer</th><th>Check</th><th>Status</th><th>Details</th></tr>
+    </thead>
+    <tbody>
+<tr><td>EMPLOYEE</td><td>source</td><td>table_not_empty</td><td class='pass'>PASS</td><td>{&#x27;observed_value&#x27;: 2}</td></tr>
+<tr><td>EMPLOYEE</td><td>source</td><td>expected_columns</td><td class='pass'>PASS</td><td>{&#x27;observed_value&#x27;: [&#x27;birth_date&#x27;, &#x27;emp_no&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;hire_date&#x27;, &#x27;last_name&#x27;]}</td></tr>
+<tr><td>EMPLOYEE</td><td>open</td><td>table_not_empty</td><td class='pass'>PASS</td><td>{&#x27;observed_value&#x27;: 2}</td></tr>
+<tr><td>EMPLOYEE</td><td>open</td><td>expected_columns</td><td class='pass'>PASS</td><td>{&#x27;observed_value&#x27;: [&#x27;birth_date&#x27;, &#x27;emp_no&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;hire_date&#x27;, &#x27;last_name&#x27;, &#x27;update_date&#x27;]}</td></tr>
+    </tbody>
+  </table>
+</body>
+</html>
